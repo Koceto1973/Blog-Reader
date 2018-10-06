@@ -17,7 +17,28 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        let url = URL(string: "https://www.googleapis.com/blogger/v3/blogs/2329352809327213022/posts?key=AIzaSyCZ-rQsZYV2qOWHerjRO-6lYYiVigRmpLk")!
+        
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            
+            if error != nil { print(error!) } else {
+                
+                if let urlContent = data {
+                    do {
+                        let jsonResult = try JSONSerialization.jsonObject(with: urlContent, options: JSONSerialization.ReadingOptions.mutableContainers) as AnyObject
+                        print(jsonResult)
+                        // DispatchQueue.main.sync(execute: {  self.resultLabel.text = description  } )
+                        
+                    } catch { print("JSON Processing Failed")        }
+                    
+                }
+                
+            }
+            
         }
+        task.resume()
+    }
     
     @objc
     func insertNewObject(_ sender: Any) {

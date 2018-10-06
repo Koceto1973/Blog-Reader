@@ -28,8 +28,24 @@ class MasterViewController: UITableViewController, NSFetchedResultsControllerDel
                     do {
                         let jsonResult = try JSONSerialization.jsonObject(with: urlContent, options: JSONSerialization.ReadingOptions.mutableContainers) as AnyObject
                         if let items = jsonResult["items"] as? NSArray {
+                            let context = self.fetchedResultsController.managedObjectContext
+                            // deletion of database each time on reload ...
+                            let request = NSFetchRequest<NSFetchRequestResult>(entityName: "Event")
+                            request.returnsObjectsAsFaults = false
+                            do {
+                                let results = try context.fetch(request)
+                                if results.count > 0 {
+                                    for result in results as! [NSManagedObject] {
+                                        context.delete(result)
+                                        do {
+                                            try context.save()
+                                        } catch {   print("Particular post deletion failed")  }
+                                    }
+                                } else {  print("No results")  }
+                            } catch {  print("Couldn't fetch posts for deletion")  }
+                            
                             for item in items {
-                                let context = self.fetchedResultsController.managedObjectContext
+                                
                                 let newEvent = Event(context: context)
                                 
                                 // If appropriate, configure the new managed object in the core data
